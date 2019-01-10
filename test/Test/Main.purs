@@ -17,6 +17,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Testable, Result, quickCheck, quickCheck', (<?>))
 import Test.QuickCheck.Gen (Gen)
 
+foreign import thisIsUndefined :: Json
 foreign import thisIsNull :: Json
 foreign import thisIsBoolean :: Json
 foreign import thisIsNumber :: Json
@@ -127,7 +128,18 @@ parserTest = do
   roundtripTest = do
     json <- Gen.resize (const 5) genJson
     let parsed = jsonParser (stringify json)
-    pure $ parsed == Right json <?> show (stringify <$> parsed) <> " /= " <> stringify json 
+    pure $ parsed == Right json <?> show (stringify <$> parsed) <> " /= " <> stringify json
+
+compareTest :: Effect Unit
+compareTest = do
+  let a = obj "key" thisIsUndefined
+      b = obj "key" thisIsUndefined
+      c = obj "foo" thisIsUndefined
+  assert ((a == a) <?> "Error object a == object a")
+  assert ((a == b) <?> "Error object a == object b")
+  assert ((a /= c) <?> "Error object a /= object c")
+  where
+    obj k = fromObject <<< Obj.singleton k
 
 assert :: forall prop. Testable prop => prop -> Effect Unit
 assert = quickCheck' 1
@@ -146,3 +158,5 @@ main = do
   toTest
   log "jsonParser tests"
   parserTest
+  log "equality tests"
+  compareTest

@@ -90,8 +90,8 @@ exports._compare = function _compare (EQ, GT, LT, a, b) {
       var keys = akeys.concat(bkeys).sort();
       for (var j = 0; j < keys.length; j++) {
         var k = keys[j];
-        if (a[k] === undefined) return LT;
-        else if (b[k] === undefined) return GT;
+        if (!a.hasOwnProperty(k)) return LT;
+        else if (!b.hasOwnProperty(k)) return GT;
         var ck = _compare(EQ, GT, LT, a[k], b[k]);
         if (ck !== EQ) return ck;
       }

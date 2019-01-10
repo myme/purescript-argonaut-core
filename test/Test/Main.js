@@ -1,5 +1,6 @@
 "use strict";
 
+exports.thisIsUndefined = undefined;
 exports.thisIsNull = null;
 exports.thisIsBoolean = true;
 exports.thisIsNumber = 12;
